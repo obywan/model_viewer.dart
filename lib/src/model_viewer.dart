@@ -2,13 +2,12 @@
 
 import 'dart:async' show Completer;
 import 'dart:convert' show utf8;
-import 'dart:io'
-    show File, HttpRequest, HttpServer, HttpStatus, InternetAddress, Platform;
+import 'dart:io' show File, HttpRequest, HttpServer, HttpStatus, InternetAddress, Platform;
 import 'dart:typed_data' show Uint8List;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_android/android_content.dart' as android_content;
+// import 'package:flutter_android/android_content.dart' as android_content;
 import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -17,13 +16,13 @@ import 'html_builder.dart';
 /// Flutter widget for rendering interactive 3D models.
 class ModelViewer extends StatefulWidget {
   ModelViewer(
-      {Key key,
+      {Key? key,
       this.backgroundColor = Colors.white,
-      @required this.src,
+      required this.src,
       this.alt,
-      this.ar,
-      this.arModes,
-      this.arScale,
+      // this.ar,
+      // this.arModes,
+      // this.arScale,
       this.autoRotate,
       this.autoRotateDelay,
       this.autoPlay,
@@ -53,47 +52,46 @@ class ModelViewer extends StatefulWidget {
   /// Configures the model with custom text that will be used to describe the
   /// model to viewers who use a screen reader or otherwise depend on additional
   /// semantic context to understand what they are viewing.
-  final String alt;
+  final String? alt;
 
   /// Enable the ability to launch AR experiences on supported devices.
-  final bool ar;
+  // final bool ar;
 
   /// A prioritized list of the types of AR experiences to enable, if available.
-  final List<String> arModes;
+  // final List<String> arModes;
 
   /// Controls the scaling behavior in AR mode in Scene Viewer. Set to "fixed"
   /// to disable scaling of the model, which sets it to always be at 100% scale.
   /// Defaults to "auto" which allows the model to be resized.
-  final String arScale;
+  // final String arScale;
 
   /// Enables the auto-rotation of the model.
-  final bool autoRotate;
+  final bool? autoRotate;
 
   /// Sets the delay before auto-rotation begins. The format of the value is a
   /// number in milliseconds. The default is 3000.
-  final int autoRotateDelay;
+  final int? autoRotateDelay;
 
   /// If this is true and a model has animations, an animation will
   /// automatically begin to play when this attribute is set (or when the
   /// property is set to true). The default is false.
-  final bool autoPlay;
+  final bool? autoPlay;
 
   /// Enables controls via mouse/touch when in flat view.
-  final bool cameraControls;
+  final bool? cameraControls;
 
   /// The URL to a USDZ model which will be used on supported iOS 12+ devices
   /// via AR Quick Look.
-  final String iosSrc;
+  final String? iosSrc;
 
   @override
   State<ModelViewer> createState() => _ModelViewerState();
 }
 
 class _ModelViewerState extends State<ModelViewer> {
-  final Completer<WebViewController> _controller =
-      Completer<WebViewController>();
+  final Completer<WebViewController> _controller = Completer<WebViewController>();
 
-  HttpServer _proxy;
+  HttpServer? _proxy;
 
   @override
   void initState() {
@@ -105,7 +103,7 @@ class _ModelViewerState extends State<ModelViewer> {
   void dispose() {
     super.dispose();
     if (_proxy != null) {
-      _proxy.close(force: true);
+      _proxy!.close(force: true);
       _proxy = null;
     }
   }
@@ -124,10 +122,10 @@ class _ModelViewerState extends State<ModelViewer> {
       initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
       onWebViewCreated: (final WebViewController webViewController) async {
         _controller.complete(webViewController);
-        final host = _proxy.address.address;
-        final port = _proxy.port;
+        final host = _proxy!.address.address;
+        final port = _proxy!.port;
         final url = "http://$host:$port/";
-        print('>>>> ModelViewer initializing... <$url>'); // DEBUG
+        // print('>>>> ModelViewer initializing... <$url>'); // DEBUG
         await webViewController.loadUrl(url);
       },
       navigationDelegate: (final NavigationRequest navigation) async {
@@ -138,23 +136,23 @@ class _ModelViewerState extends State<ModelViewer> {
         if (!navigation.url.startsWith("intent://")) {
           return NavigationDecision.navigate;
         }
-        try {
-          // See: https://developers.google.com/ar/develop/java/scene-viewer
-          final intent = android_content.Intent(
-            action: "android.intent.action.VIEW", // Intent.ACTION_VIEW
-            data: Uri.parse("https://arvr.google.com/scene-viewer/1.0").replace(
-              queryParameters: <String, dynamic>{
-                'file': widget.src,
-                'mode': 'ar_only',
-              },
-            ),
-            package: "com.google.ar.core",
-            flags: 0x10000000, // Intent.FLAG_ACTIVITY_NEW_TASK,
-          );
-          await intent.startActivity();
-        } catch (error) {
-          print('>>>> ModelViewer failed to launch AR: $error'); // DEBUG
-        }
+        // try {
+        //   // See: https://developers.google.com/ar/develop/java/scene-viewer
+        //   final intent = android_content.Intent(
+        //     action: "android.intent.action.VIEW", // Intent.ACTION_VIEW
+        //     data: Uri.parse("https://arvr.google.com/scene-viewer/1.0").replace(
+        //       queryParameters: <String, dynamic>{
+        //         'file': widget.src,
+        //         'mode': 'ar_only',
+        //       },
+        //     ),
+        //     package: "com.google.ar.core",
+        //     flags: 0x10000000, // Intent.FLAG_ACTIVITY_NEW_TASK,
+        //   );
+        //   await intent.startActivity();
+        // } catch (error) {
+        //   print('>>>> ModelViewer failed to launch AR: $error'); // DEBUG
+        // }
         return NavigationDecision.prevent;
       },
       onPageStarted: (final String url) {
@@ -164,8 +162,7 @@ class _ModelViewerState extends State<ModelViewer> {
         //print('>>>> ModelViewer finished loading: <$url>'); // DEBUG
       },
       onWebResourceError: (final WebResourceError error) {
-        print(
-            '>>>> ModelViewer failed to load: ${error.description} (${error.errorType} ${error.errorCode})'); // DEBUG
+        print('>>>> ModelViewer failed to load: ${error.description} (${error.errorType} ${error.errorCode})'); // DEBUG
       },
     );
   }
@@ -176,9 +173,9 @@ class _ModelViewerState extends State<ModelViewer> {
       backgroundColor: widget.backgroundColor,
       src: '/model',
       alt: widget.alt,
-      ar: widget.ar,
-      arModes: widget.arModes,
-      arScale: widget.arScale,
+      // ar: widget.ar,
+      // arModes: widget.arModes,
+      // arScale: widget.arScale,
       autoRotate: widget.autoRotate,
       autoRotateDelay: widget.autoRotateDelay,
       autoPlay: widget.autoPlay,
@@ -190,7 +187,7 @@ class _ModelViewerState extends State<ModelViewer> {
   Future<void> _initProxy() async {
     final url = Uri.parse(widget.src);
     _proxy = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-    _proxy.listen((final HttpRequest request) async {
+    _proxy!.listen((final HttpRequest request) async {
       //print("${request.method} ${request.uri}"); // DEBUG
       //print(request.headers); // DEBUG
       final response = request.response;
@@ -198,8 +195,7 @@ class _ModelViewerState extends State<ModelViewer> {
       switch (request.uri.path) {
         case '/':
         case '/index.html':
-          final htmlTemplate = await rootBundle
-              .loadString('packages/model_viewer/etc/assets/template.html');
+          final htmlTemplate = await rootBundle.loadString('packages/model_viewer/etc/assets/template.html');
           final html = utf8.encode(_buildHTML(htmlTemplate));
           response
             ..statusCode = HttpStatus.ok
@@ -210,12 +206,10 @@ class _ModelViewerState extends State<ModelViewer> {
           break;
 
         case '/model-viewer.js':
-          final code = await _readAsset(
-              'packages/model_viewer/etc/assets/model-viewer.js');
+          final code = await _readAsset('packages/model_viewer/etc/assets/model-viewer.js');
           response
             ..statusCode = HttpStatus.ok
-            ..headers
-                .add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers.add("Content-Type", "application/javascript;charset=UTF-8")
             ..headers.add("Content-Length", code.lengthInBytes.toString())
             ..add(code);
           await response.close();
@@ -225,9 +219,7 @@ class _ModelViewerState extends State<ModelViewer> {
           if (url.isAbsolute && !url.isScheme("file")) {
             await response.redirect(url); // TODO: proxy the resource
           } else {
-            final data = await (url.isScheme("file")
-                ? _readFile(url.path)
-                : _readAsset(url.path));
+            final data = await (url.isScheme("file") ? _readFile(url.path) : _readAsset(url.path));
             response
               ..statusCode = HttpStatus.ok
               ..headers.add("Content-Type", "application/octet-stream")

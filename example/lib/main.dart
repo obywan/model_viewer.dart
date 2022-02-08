@@ -16,7 +16,6 @@ class MyApp extends StatelessWidget {
           //src: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
           src: 'etc/assets/Astronaut.glb', // a bundled asset file
           alt: "A 3D model of an astronaut",
-          ar: true,
           autoRotate: true,
           cameraControls: true,
         ),

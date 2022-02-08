@@ -9,36 +9,35 @@ abstract class HTMLBuilder {
 
   static String build(
       {final String htmlTemplate = '',
-      @required final String src,
+      required final String src,
       final Color backgroundColor = const Color(0xFFFFFF),
-      final String alt,
-      final bool ar,
-      final List<String> arModes,
-      final String arScale,
-      final bool autoRotate,
-      final int autoRotateDelay,
-      final bool autoPlay,
-      final bool cameraControls,
-      final String iosSrc}) {
+      final String? alt,
+      // final bool ar,
+      // final List<String> arModes,
+      // final String arScale,
+      final bool? autoRotate,
+      final int? autoRotateDelay,
+      final bool? autoPlay,
+      final bool? cameraControls,
+      final String? iosSrc}) {
     final html = StringBuffer(htmlTemplate);
     html.write('<model-viewer');
     html.write(' src="${htmlEscape.convert(src)}"');
-    html.write(
-        ' style="background-color: rgb(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue});"');
+    html.write(' style="background-color: rgb(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue});"');
     if (alt != null) {
       html.write(' alt="${htmlEscape.convert(alt)}"');
     }
     // TODO: animation-name
     // TODO: animation-crossfade-duration
-    if (ar ?? false) {
-      html.write(' ar');
-    }
-    if (arModes != null) {
-      html.write(' ar-modes="${htmlEscape.convert(arModes.join(' '))}"');
-    }
-    if (arScale != null) {
-      html.write(' ar-scale="${htmlEscape.convert(arScale)}"');
-    }
+    // if (ar ?? false) {
+    //   html.write(' ar');
+    // }
+    // if (arModes != null) {
+    //   html.write(' ar-modes="${htmlEscape.convert(arModes.join(' '))}"');
+    // }
+    // if (arScale != null) {
+    //   html.write(' ar-scale="${htmlEscape.convert(arScale)}"');
+    // }
     if (autoRotate ?? false) {
       html.write(' auto-rotate');
     }
